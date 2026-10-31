@@ -28,7 +28,9 @@ export default function InputSection({
         onChange={(e) => onInputChange(e.target.value)}
         onKeyDown={handleKeyDown}
         rows={5}
+        maxLength={20000}
         aria-label="Paste your notice here"
+        aria-describedby="shortcut-hint"
       />
       <div className="input-actions">
         <button
@@ -47,7 +49,7 @@ export default function InputSection({
         >
           {STRINGS.trySamples}
         </button>
-        <span className="shortcut-hint" aria-hidden="true">
+        <span id="shortcut-hint" className="shortcut-hint" aria-hidden="true">
           {STRINGS.shortcutHint}
         </span>
       </div>

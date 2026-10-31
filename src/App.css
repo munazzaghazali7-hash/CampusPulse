@@ -4,6 +4,27 @@
    Follows rules.md #25-35 and DESIGN-3.md component specs.
    ========================================================================== */
 
+/* ── Accessibility: Skip Link ──────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--spacing-16);
+  background: var(--color-dusk);
+  color: var(--color-paper);
+  padding: var(--spacing-8) var(--spacing-16);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-sm);
+  font-weight: var(--font-weight-medium);
+  z-index: 9999;
+  transition: top 0.2s ease;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: var(--spacing-16);
+  outline: 2px solid var(--color-signal-blue);
+  outline-offset: 2px;
+}
+
 /* ── App Layout ────────────────────────────────────────────────────── */
 .app {
   min-height: 100vh;

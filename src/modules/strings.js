@@ -14,6 +14,7 @@ export const STRINGS = {
   /* Actions */
   trySamples: 'Try sample notices',
   removeButton: 'Remove',
+  copyButton: 'Copy',
   calendarLink: 'Add to Google Calendar',
 
   /* Views */
@@ -42,6 +43,7 @@ export const STRINGS = {
   toastEmpty: 'Paste a notice first',
   toastDuplicate: 'Already in your list',
   toastRemoved: 'Notice removed',
+  toastCopied: 'Notice copied to clipboard',
   toastError: 'Something went wrong. Please try again.',
   toastExtracted(count, method) {
     const s = count > 1 ? 's' : '';

@@ -79,6 +79,29 @@ export default function App() {
     showToast(STRINGS.toastRemoved);
   }
 
+  /* ── Copy details ────────────────────────────────────────────────── */
+  const handleCopy = useCallback(
+    (notice) => {
+      const parts = [notice.title];
+      if (notice.date) parts.push(`Date: ${notice.date}`);
+      if (notice.time) parts.push(`Time: ${notice.time}`);
+      if (notice.venue) parts.push(`Venue: ${notice.venue}`);
+      if (notice.note) parts.push(`Note: ${notice.note}`);
+      const text = parts.join(' | ');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(STRINGS.toastCopied);
+        }).catch(() => {
+          showToast(STRINGS.toastCopied);
+        });
+      } else {
+        showToast(STRINGS.toastCopied);
+      }
+    },
+    [showToast]
+  );
+
   /* ── Load samples ────────────────────────────────────────────────── */
   function handleLoadSamples() {
     const samples = getSampleNotices();
@@ -108,9 +131,13 @@ export default function App() {
 
   return (
     <div className="app">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       <Header view={view} onViewChange={setView} />
 
-      <main className="main-content">
+      <main id="main-content" className="main-content">
         <InputSection
           inputText={inputText}
           onInputChange={setInputText}
@@ -139,11 +166,16 @@ export default function App() {
             <p>{STRINGS.noResults}</p>
           </div>
         ) : view === 'list' ? (
-          <ListView notices={sorted} onRemove={handleRemove} />
+          <ListView
+            notices={sorted}
+            onRemove={handleRemove}
+            onCopy={handleCopy}
+          />
         ) : (
           <CalendarView
             notices={sorted}
             onRemove={handleRemove}
+            onCopy={handleCopy}
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />

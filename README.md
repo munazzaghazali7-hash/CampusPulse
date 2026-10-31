@@ -1,7 +1,32 @@
 # Campus Pulse 🏛️⚡
 
+[![CI](https://github.com/munazzaghazali7-hash/CampusPulse/actions/workflows/ci.yml/badge.svg)](https://github.com/munazzaghazali7-hash/CampusPulse/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-31%20passed-brightgreen.svg)](https://github.com/munazzaghazali7-hash/CampusPulse)
+[![Accessibility](https://img.shields.io/badge/accessibility-WCAG%202.1%20AA-blue.svg)](https://github.com/munazzaghazali7-hash/CampusPulse)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > **Intelligent campus notice board for students.**  
 > Transforms chaotic WhatsApp forwards and department emails into structured, prioritized notices with AI extraction, calendar sync, and weekly digests.
+
+---
+
+## 🏛️ Architecture & Data Flow
+
+```mermaid
+graph TD
+    A[Pasted Messy Notice / WhatsApp Forward] --> B[Extractor Module]
+    B -->|Gemini JSON Mode| C{API Available?}
+    C -->|Yes: gemini-3.5-flash| D[Structured Notice Objects]
+    C -->|No / Offline| E[Built-in Regex Fallback Engine]
+    E --> D
+    D --> F[Store Module & LocalStorage]
+    F --> G[Status Engine: Urgent / Upcoming / Expired]
+    F --> H[Filter & Search Engine]
+    F --> I[Weekly Digest Module]
+    G --> J[Needs Attention Today Banner]
+    G & H --> K[List View & Month Calendar View]
+    I --> L[Weekly Priority Digest Panel]
+```
 
 ---
 
@@ -15,7 +40,7 @@
 
 - **🛡️ Built-in Non-AI Fallback**:
   - Works 100% offline or with zero API key configured.
-  - Regex parser intelligently extracts day-first dates, relative dates (*"today"*, *"tomorrow"*, *"yesterday"*, *"5th Nov"*), times (*"10 AM"*, *"4 PM"*, *"23:59"*), and campus venues (*"Hall B"*, *"Seminar Hall"*, *"Auditorium"*).
+  - Regex parser intelligently extracts day-first dates, relative dates (*"today"*, *"tomorrow"*, *"yesterday"*, *"5th Nov"*, leap years), times (*"10 AM"*, *"4 PM"*, *"23:59"*, *"12:00 AM"*), and campus venues (*"Hall B"*, *"Seminar Hall"*, *"Main Audi"*).
 
 - **🚨 Priority Engine & Attention Banner**:
   - Live **"Needs attention today"** banner rendered per design specs.
@@ -30,6 +55,7 @@
   - **Month Calendar View**: Interactive month grid with notice count badges and click-to-filter day inspection.
   - **Search & Chips**: Live search across title, venue, category, and notes; category chips (`Academic`, `Deadline`, `Placement`, `Sports`, `Event`, `Other`).
   - **Google Calendar Sync**: 1-click button to export events with date, time, venue, and notes to Google Calendar.
+  - **1-Click Copy**: Copy formatted notice details to clipboard for sharing in study groups.
 
 - **📝 Weekly Digest**:
   - *"What do I need to know this week?"* button generates a sub-100-word digest summarizing immediate priorities.
@@ -42,6 +68,18 @@
     - Primary Outlined CTA button in Signal Blue (`#41a1cf`, border/text only, no fill).
     - Secondary Outlined button in Twilight (`#282834`).
     - Frosted Navigation Pill (50px radius) with backdrop blur.
+
+---
+
+## 📋 PRD Requirements Traceability Matrix
+
+| ID | Requirement | Implementation | Automated Test |
+|---|---|---|---|
+| **R1** | Smart input (messy text $\to$ structured card) | `src/modules/extractor.js` | `tests/extractor.test.js` |
+| **R2** | Organised view (search, filter, calendar) | `src/components/FilterBar.jsx`, `CalendarView.jsx` | `tests/filters.test.js` |
+| **R3** | Priority & reminders (Urgent/Upcoming/Expired) | `src/modules/status.js`, `AttentionBanner.jsx` | `tests/status.test.js` |
+| **R4** | AI summary (under 100 words weekly digest) | `src/modules/digest.js`, `DigestPanel.jsx` | `tests/digest.test.js` |
+| **R5** | Usable interface (responsive $\ge 360$px, WCAG a11y) | `src/App.jsx`, `src/App.css`, `index.css` | `tests/edge_cases.test.js` |
 
 ---
 
@@ -76,18 +114,19 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & CI
 
-Campus Pulse features a comprehensive test suite covering all core requirements, edge cases, date parsing, status rules, deduplication, and XSS sanitization:
+Campus Pulse includes 31 automated tests covering unit logic, integration flows, edge cases, date normalization, status rules, deduplication, and XSS sanitization:
 
 ```bash
+# Run automated tests
 npm test
-```
 
-### Build for Production
-```bash
+# Run production build
 npm run build
 ```
+
+Every push and pull request is automatically tested and built via GitHub Actions (`.github/workflows/ci.yml`).
 
 ---
 

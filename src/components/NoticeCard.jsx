@@ -31,7 +31,7 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function NoticeCard({ notice, onRemove }) {
+export default function NoticeCard({ notice, onRemove, onCopy }) {
   const status = getStatus(notice);
   const relative = getRelativeLabel(notice);
   const calUrl = buildCalendarUrl(notice);
@@ -74,6 +74,15 @@ export default function NoticeCard({ notice, onRemove }) {
           >
             {STRINGS.calendarLink} ↗
           </a>
+        )}
+        {onCopy && (
+          <button
+            className="btn-ghost"
+            onClick={() => onCopy(notice)}
+            aria-label={`${STRINGS.copyButton} ${notice.title}`}
+          >
+            {STRINGS.copyButton}
+          </button>
         )}
         <button
           className="btn-ghost btn-ghost--danger"

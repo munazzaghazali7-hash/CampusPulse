@@ -5,7 +5,13 @@ import NoticeCard from './NoticeCard';
  * Month-grid calendar view.
  * Click a day to see notices for that date below the grid.
  */
-export default function CalendarView({ notices, onRemove, selectedDate, onDateSelect }) {
+export default function CalendarView({
+  notices,
+  onRemove,
+  onCopy,
+  selectedDate,
+  onDateSelect,
+}) {
   const [current, setCurrent] = useState(new Date());
   const year = current.getFullYear();
   const month = current.getMonth();
@@ -92,7 +98,12 @@ export default function CalendarView({ notices, onRemove, selectedDate, onDateSe
             })}
           </h3>
           {detailNotices.map((n) => (
-            <NoticeCard key={n.id} notice={n} onRemove={onRemove} />
+            <NoticeCard
+              key={n.id}
+              notice={n}
+              onRemove={onRemove}
+              onCopy={onCopy}
+            />
           ))}
         </div>
       )}

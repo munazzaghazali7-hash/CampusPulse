@@ -189,13 +189,17 @@ function extractDate(text, today) {
     return fmt(d);
   }
 
-  /* "5th Nov", "5 November", "5 Nov" — day-first */
+  /* "5th Nov", "5 November", "29th Feb 2028" — day-first with optional year */
   const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-  const mMatch = text.match(/(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*/i);
+  const mMatch = text.match(/(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*(?:\s+(\d{4}))?/i);
   if (mMatch) {
     const day = mMatch[1].padStart(2, '0');
     const mi = monthNames.indexOf(mMatch[2].toLowerCase().substring(0, 3));
-    if (mi !== -1) return `${today.getFullYear()}-${String(mi + 1).padStart(2, '0')}-${day}`;
+    const year = mMatch[3] || today.getFullYear();
+    if (mi !== -1) {
+      const candidate = `${year}-${String(mi + 1).padStart(2, '0')}-${day}`;
+      if (!isNaN(new Date(candidate + 'T00:00:00').getTime())) return candidate;
+    }
   }
 
   /* DD/MM/YYYY or DD-MM-YYYY (day-first, rule 12) */
@@ -238,18 +242,25 @@ function extractTime(text) {
 }
 
 function extractVenue(text) {
+  // Strip quotes for clean matching
+  const unquoted = text.replace(/[“"”']/g, '');
+
   // Explicit label: Venue: Hall B, Location: Auditorium
-  const explicit = text.match(/(?:venue|location|place)\s*[:\-]\s*([^\n,;]+)/i);
+  const explicit = unquoted.match(/(?:venue|location|place)\s*[:\-]\s*([^\n,;]+)/i);
   if (explicit) return explicit[1].trim();
 
-  // Named halls/rooms/buildings: "Hall B", "Seminar Hall", "Auditorium", "Main Building"
-  const named = text.match(
-    /\b((?:Seminar\s+Hall|Conference\s+Hall|Auditorium|Main\s+Building|Central\s+Library|College\s+Ground|(?:Hall|Room|Lab|Block|Building)\s+[A-Za-z0-9\-]+)(?:\s*,\s*[A-Za-z0-9\s]+)?)\b/i
+  // Named halls/rooms/buildings: "Hall B", "Seminar Hall", "Main Audi", "Auditorium", "Main Building"
+  const named = unquoted.match(
+    /\b((?:Seminar\s+Hall|Conference\s+Hall|Main\s+Audi|Auditorium|Audi|Main\s+Building|Central\s+Library|College\s+Ground|(?:Hall|Room|Lab|Block|Building)\s+[A-Za-z0-9\-]+)(?:\s*,\s*[A-Za-z0-9\s]+)?)\b/i
   );
   if (named) return named[1].trim();
 
+  // "at/in <Venue>"
+  const atMatch = unquoted.match(/\b(?:at|in)\s+([A-Z][a-zA-Z0-9\s]+?)(?:,|\.|\n|$)/);
+  if (atMatch && atMatch[1].trim().length > 2) return atMatch[1].trim();
+
   // Standalone venue words
-  const standalone = text.match(/\b(Seminar\s+Hall|Auditorium|Library|Ground)\b/i);
+  const standalone = unquoted.match(/\b(Seminar\s+Hall|Auditorium|Audi|Library|Ground)\b/i);
   if (standalone) return standalone[1].trim();
 
   return '';

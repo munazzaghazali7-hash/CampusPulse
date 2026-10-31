@@ -139,5 +139,3 @@ Every push and pull request is automatically tested and built via GitHub Actions
 
 ---
 
-## 📄 License
-MIT
